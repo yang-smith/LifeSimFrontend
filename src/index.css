@@ -1,0 +1,99 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    display: flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    height: 100vh; /* 全屏高度 */
+    margin: 0; /* 去掉默认边距 */
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    max-width: 900px;
+    background-color: #f9f9f9;  /* 更淡的背景色 */
+    box-shadow: 0 5px 30px rgba(0,0,0,0.2);  /* 增加阴影 */
+    border-radius: 20px;  /* 更大的圆角 */
+    overflow: hidden;
+    padding: 20px;
+    position: relative;
+    transition: box-shadow 0.3s ease;  /* 添加过渡效果 */
+    max-height: 95vh;  /* 设置最大高度为视窗的95% */
+    overflow-y: auto;  /* 垂直方向添加滚动条 */
+
+    /* 当鼠标悬停时增加阴影，为应用添加交互感 */
+    #app:hover {
+        box-shadow: 0 8px 50px rgba(0,0,0,0.25);
+    }
+}
+
+.content-wrapper {
+    flex: 1;  /* 使内容区域尽可能填充可用空间 */
+    padding-right: 220px;  /* 预留空间给玩家卡片 */
+    overflow-y: auto;
+}
+
+h1, h2, p, ul {
+    margin: 20px 0; /* 增加上下边距 */
+}
+
+ul {
+    padding-left: 30px; /* 增加左填充，使列表看起来更整齐 */
+}
+
+.button, .loading-indicator {
+    margin-top: 20px; /* 为按钮和加载指示器增加上边距 */
+}
+
+.card {
+    background-color: #fafafa; /* 浅灰色背景 */
+    padding: 15px;
+    margin: 15px 0;
+    border: 1px solid #e1e1e1; 
+    border-radius: 5px;
+}
+
+
+.player-card {
+    position: absolute;
+    top: 30px;  /* 调整位置 */
+    right: 30px;
+    width: 180px;  /* 增加宽度 */
+    background-color: #fff;
+    border: 1px solid #e1e1e1;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);  /* 添加阴影 */
+    border-radius: 10px;  /* 增加圆角 */
+    padding: 15px;
+    z-index: 10;
+
+    h2 {
+        color: #333;  /* 深色字体 */
+        font-weight: 600;  /* 更粗的字体 */
+        margin-bottom: 10px;  /* 调整下边距 */
+    }
+
+    ul {
+        color: #555;  /* 深色字体 */
+    }
+}
+
+.loading-indicator .spinner {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border: 5px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    border-top: 5px solid #333;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;  /* 与文字之间的间隔 */
+}
+
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
