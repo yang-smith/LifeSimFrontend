@@ -59,6 +59,7 @@ export default {
   data() {
     return {
       player: {},
+      baseURL: 'http://127.0.0.1:5000',
       eventDescription: "",
       update:"",
       gameOver: false,
@@ -110,7 +111,7 @@ export default {
       this.isStartLoading = true;
       try {
         this.gameStarted = true;
-        const response = await axios.get("http://127.0.0.1:5000/start");
+        const response = await axios.get("${this.baseURL}/start");
         this.player = response.data.player;
         this.eventDescription = response.data.event_description;
       } catch (error) {
@@ -121,7 +122,7 @@ export default {
     async continueGame() {
       this.isEventLoading = true;
       try {
-        const response = await axios.post("http://127.0.0.1:5000/continue", {
+        const response = await axios.post("${this.baseURL}/continue", {
             player: this.player
         }, {
             headers: {
@@ -145,7 +146,7 @@ export default {
     async handleChoice(choice) {
       this.isChoiceLoading = true;
       try {
-        const response = await axios.post("http://127.0.0.1:5000/choice", {
+        const response = await axios.post("${this.baseURL}/choice", {
             player: this.player,
             choice: choice
         },{
