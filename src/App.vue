@@ -22,20 +22,21 @@
         <!-- 游戏中的内容 -->
         <div>
           <p>{{ playerAttributes }}</p>
+          <div v-if="isEventLoading" class="loading-indicator">
+            <div class="spinner"></div>正在生成事件...
+          </div>
           <div v-html="compiledMarkdown"></div>
           <div v-if="continueOrchoice & !isStartLoading">
             <button @click="continueGame">继续</button>
           </div>
-          <div v-if="isEventLoading" class="loading-indicator">
-            <div class="spinner"></div>正在生成事件...
-          </div>
+          <div v-if="isChoiceLoading" class="loading-indicator">
+            <div class="spinner"></div>正在评估你的选择...
+          </div>     
           <div v-if="!continueOrchoice">
             <input v-model="userChoice" placeholder="请输入你的选择">
             <button @click="handleChoice(userChoice)">选择</button>        
           </div>
-          <div v-if="isChoiceLoading" class="loading-indicator">
-            <div class="spinner"></div>正在评估你的选择...
-          </div>
+
         </div>
       </div>
     </div>
