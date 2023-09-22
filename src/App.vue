@@ -60,7 +60,7 @@ export default {
   data() {
     return {
       player: {},
-      baseURL: 'http://127.0.0.1:5000',
+      baseURL: 'http://lifeapi.autumnriver.chat',
       eventDescription: "",
       update:"",
       gameOver: false,
