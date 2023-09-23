@@ -22,10 +22,10 @@
         <!-- 游戏中的内容 -->
         <div>
           <p>{{ playerAttributes }}</p>
+          <div v-html="compiledMarkdown"></div>
           <div v-if="isEventLoading" class="loading-indicator">
             <div class="spinner"></div>正在生成事件...
           </div>
-          <div v-html="compiledMarkdown"></div>
           <div v-if="continueOrchoice & !isStartLoading">
             <button @click="continueGame">继续</button>
           </div>
@@ -53,14 +53,22 @@
 </template>
 
 <script>
-import axios from "axios";
+// import axios from "axios";
 import MarkdownIt from 'markdown-it';
-
+import { generateBirthEvent, generateEvent, undergoEvent, update, death } from './event.js';
 export default {
   data() {
     return {
-      player: {},
-      baseURL: 'https://lifeapi.autumnriver.chat/api',
+      player: {
+            age: 0,
+            gender: Math.random() > 0.5 ? '男' : '女',
+            appearance: Math.floor(Math.random() * 10) + 1,
+            intelligence: Math.floor(Math.random() * 10) + 1,
+            wealth: Math.floor(Math.random() * 10) + 1,
+            health: Math.floor(Math.random() * 10) + 1,
+            mental_state: Math.floor(Math.random() * 10) + 1,
+            experiences: [],
+        },
       eventDescription: "",
       update:"",
       gameOver: false,
@@ -73,11 +81,11 @@ export default {
       continueOrchoice: true,
       attributeTranslations: {
         age: "年龄",
-        appearance: "外貌",
         gender: "性别",
+        appearance: "外貌",
         intelligence: "智力",
-        health: "身体健康",
         wealth: "财富",
+        health: "身体健康",
         mental_state: "心理健康",
         // 如果还有其他属性，也可以在这里添加
       },
@@ -97,24 +105,26 @@ export default {
     },
     compiledMarkdown() {
             return this.md.render(this.eventDescription);
+            // return this.eventDescription;
     },
   },
   watch: {
-    player: {
-      deep: true,
-      handler(newValue) {
-        localStorage.setItem('playerState', JSON.stringify(newValue));
-      }
-    }
+    // player: {
+    //   deep: true,
+    //   handler(newValue) {
+    //     localStorage.setItem('playerState', JSON.stringify(newValue));
+    //   }
+    // }
   },
   methods: {
     async startGame() {
       this.isStartLoading = true;
       try {
         this.gameStarted = true;
-        const response = await axios.get("${this.baseURL}/start");
-        this.player = response.data.player;
-        this.eventDescription = response.data.event_description;
+        const response = await generateBirthEvent(this.player);
+        console.log(response)
+        this.eventDescription = response;
+        this.player.experiences.push(response);
       } catch (error) {
         console.error("Error starting the game:", error);
       }
@@ -123,21 +133,17 @@ export default {
     async continueGame() {
       this.isEventLoading = true;
       try {
-        const response = await axios.post("${this.baseURL}/continue", {
-            player: this.player
-        }, {
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
-        if (response.data.game_over) {
+        this.player.age += 10;
+        if(this.player.age + 30 > this.player.health*10 || this.player.wealth < 0 || this.player.mental_state < 0) {
+          const response = await death(this.player);
+          this.eventDescription = response;
+          this.player.experiences.push(response);
           this.gameOver = true;
-          this.player = response.data.player;
-          this.eventDescription = response.data.event_description;
-        } else {
-          this.player = response.data.player;
-          this.eventDescription = response.data.event_description;
+          return;
         }
+        const response = await generateEvent(this.player);
+        this.eventDescription = response;
+        this.player.experiences.push(response);
       } catch (error) {
         console.error("Error continuing the game:", error);
       }
@@ -147,17 +153,13 @@ export default {
     async handleChoice(choice) {
       this.isChoiceLoading = true;
       try {
-        const response = await axios.post("${this.baseURL}/choice", {
-            player: this.player,
-            choice: choice
-        },{
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
-        this.player = response.data.player;
-        this.eventDescription = response.data.event_description;
-        this.update = response.data.update;
+
+        const response = await undergoEvent(this.player, choice);
+        this.eventDescription = response;
+        this.player.experiences.push(response);
+        this.update = await update(this.player);
+        this.player.experiences.push(this.update);
+        this.updatePlayer(this.update);
       } catch (error) {
         console.error("Error handling choice:", error);
       }
@@ -166,21 +168,52 @@ export default {
       this.continueOrchoice = true;
     },
     resetGame() {
-      localStorage.removeItem('playerState');
-      this.player = {};
+      // localStorage.removeItem('playerState');
+      this.player = {
+      age: 0,
+      gender: Math.random() > 0.5 ? '男' : '女',
+      appearance: Math.floor(Math.random() * 10) + 1,
+      intelligence: Math.floor(Math.random() * 10) + 1,
+      wealth: Math.floor(Math.random() * 10) + 1,
+      health: Math.floor(Math.random() * 10) + 1,
+      mental_state: Math.floor(Math.random() * 10) + 1,
+      experiences: [],
+      };
       this.eventDescription = "";
       this.gameOver = false;
       this.gameStarted = false;
       this.startGame();
+    },
+    updatePlayer(inputString) {
+      // 提取JSON部分
+      const jsonMatch = inputString.match(/\{[^}]+\}/);
+      if (!jsonMatch) {
+        console.error("No JSON found in the provided string.");
+        return;
+      }
+      console.log(jsonMatch[0]);
+      const extractedJson = jsonMatch[0];
+      // 将JSON字符串解析为一个对象
+      const attributesToUpdate = JSON.parse(extractedJson);
+      console.log(attributesToUpdate);
+      // 使用解析的对象来更新player的相关属性
+      for (let key in attributesToUpdate) {
+        // 翻译键
+        const attributeKey = Object.keys(this.attributeTranslations).find(k => this.attributeTranslations[k] === key);
+        if (attributeKey && Object.prototype.hasOwnProperty.call(this.player, attributeKey)) {
+          this.player[attributeKey] = attributesToUpdate[key];
+        }
+      }
     }
+
   },
   mounted() {
-    const savedPlayerState = localStorage.getItem('playerState');
-    if (savedPlayerState) {
-        this.player = JSON.parse(savedPlayerState);
-    } else {
-        this.startGame();
-    }
+  //   const savedPlayerState = localStorage.getItem('playerState');
+  //   if (savedPlayerState) {
+  //       this.player = JSON.parse(savedPlayerState);
+  //   } else {
+  //       this.startGame();
+  //   }
   },
 };
 </script>
