@@ -4,6 +4,7 @@ const openAiKey = process.env.NEXT_PUBLIC_OPENAI_KEY;
 const openAiEndpoint = `https://api.openai.com/v1/chat/completions`;
 
 export async function fetchFromOpenAI(conversation, model = 'gpt-3.5-turbo', maxTokens = 1024) {
+    console.log(openAiKey);
     const response = await fetch(openAiEndpoint, {
         method: 'POST',
         headers: {
