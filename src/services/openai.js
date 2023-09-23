@@ -1,3 +1,4 @@
+// openai key
 const openAiKey = process.env.OPENAI_KEY;
 
 const openAiEndpoint = `https://api.openai.com/v1/chat/completions`;
