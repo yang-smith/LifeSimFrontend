@@ -1,4 +1,5 @@
 // openai key
+require('dotenv').config();
 const openAiKey = process.env.NEXT_PUBLIC_OPENAI_KEY;
 
 const openAiEndpoint = `https://api.openai.com/v1/chat/completions`;
