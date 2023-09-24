@@ -137,6 +137,9 @@ export default {
       if (this.preloadedEvent) {
             this.eventDescription = this.preloadedEvent;
             this.player.experiences.push(this.preloadedEvent);
+            if(this.player.age > this.player.health*10 || this.player.wealth < 0 || this.player.mental_state < 0) {
+              this.gameOver = true;
+            }
             this.preloadedEvent = null;
             this.isEventLoading = false;
             this.continueOrchoice = false;  
