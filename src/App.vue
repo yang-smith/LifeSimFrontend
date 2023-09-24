@@ -137,7 +137,6 @@ export default {
       if (this.preloadedEvent) {
             this.eventDescription = this.preloadedEvent;
             this.player.experiences.push(this.preloadedEvent);
-            this.preloadedEvent = null;
             if(this.player.age > this.player.health*10 || this.player.wealth < 0 || this.player.mental_state < 0) {
               this.gameOver = true;
             }
@@ -178,7 +177,7 @@ export default {
       this.eventDescription += this.update;
       this.isChoiceLoading = false;
       this.continueOrchoice = true;
-      this.player.age += 10;
+      this.player.age += 50;
       this.preloadNextEvent();  // 处理用户选择后预加载下一个事件
     },
     resetGame() {
@@ -203,6 +202,7 @@ export default {
       this.startGame();
     },
     async preloadNextEvent() {
+      this.preloadedEvent = null;
         try {
             if(this.player.age > this.player.health*10 || this.player.wealth < 0 || this.player.mental_state < 0) {
                 this.preloadedEvent = await death(this.player);
