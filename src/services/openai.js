@@ -1,28 +1,25 @@
-// openai key
-require('dotenv').config();
-const openAiKey = process.env.NEXT_PUBLIC_OPENAI_KEY;
-
-const openAiEndpoint = `https://api.openai.com/v1/chat/completions`;
+// 设置你的后端API的地址
+const backendEndpoint = 'https://api.autumnriver.chat/api/v1/post';
 
 export async function fetchFromOpenAI(conversation, model = 'gpt-3.5-turbo', maxTokens = 1024) {
-    console.log(openAiKey);
-    const response = await fetch(openAiEndpoint, {
+    // 发送请求到你的后端API，而不是直接到OpenAI
+    const response = await fetch(backendEndpoint, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${openAiKey}`,
         },
         body: JSON.stringify({
             model: model,
             messages: conversation,
             max_tokens: maxTokens,
-            // stream: true,
         }),
     });
 
+    // 检查响应是否成功
     if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.statusText}`);
+        throw new Error(`Backend API error: ${response.statusText}`);
     }
+
     const data = await response.json();
-    return data.choices[0].message.content;
+    return data.message; // 注意这里的变化，根据你后端返回的结构
 }
