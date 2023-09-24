@@ -70,6 +70,7 @@ export default {
             experiences: [],
         },
       eventDescription: "",
+      preloadedEvent: null,
       update:"",
       gameOver: false,
       gameStarted: false,
@@ -129,11 +130,19 @@ export default {
         console.error("Error starting the game:", error);
       }
       this.isStartLoading = false;
+      this.preloadNextEvent();
     },
     async continueGame() {
       this.isEventLoading = true;
+      if (this.preloadedEvent) {
+            this.eventDescription = this.preloadedEvent;
+            this.player.experiences.push(this.preloadedEvent);
+            this.preloadedEvent = null;
+            this.isEventLoading = false;
+            this.continueOrchoice = false;  
+            return;
+      }
       try {
-        this.player.age += 10;
         if(this.player.age + 30 > this.player.health*10 || this.player.wealth < 0 || this.player.mental_state < 0) {
           const response = await death(this.player);
           this.eventDescription = response;
@@ -166,6 +175,8 @@ export default {
       this.eventDescription += this.update;
       this.isChoiceLoading = false;
       this.continueOrchoice = true;
+      this.player.age += 10;
+      this.preloadNextEvent();  // 处理用户选择后预加载下一个事件
     },
     resetGame() {
       // localStorage.removeItem('playerState');
@@ -183,6 +194,17 @@ export default {
       this.gameOver = false;
       this.gameStarted = false;
       this.startGame();
+    },
+    async preloadNextEvent() {
+        try {
+            if(this.player.age + 30 > this.player.health*10 || this.player.wealth < 0 || this.player.mental_state < 0) {
+                this.preloadedEvent = await death(this.player);
+            } else {
+                this.preloadedEvent = await generateEvent(this.player);
+            }
+        } catch (error) {
+            console.error("Error preloading the next event:", error);
+        }
     },
     updatePlayer(inputString) {
       // 提取JSON部分
@@ -208,12 +230,7 @@ export default {
 
   },
   mounted() {
-  //   const savedPlayerState = localStorage.getItem('playerState');
-  //   if (savedPlayerState) {
-  //       this.player = JSON.parse(savedPlayerState);
-  //   } else {
-  //       this.startGame();
-  //   }
+
   },
 };
 </script>

@@ -1,25 +1,47 @@
-// 设置你的后端API的地址
-const backendEndpoint = 'https://api.autumnriver.chat/api/v1/post';
+// const openAiKey = process.env.OPENAI_KEY;
+const openAiEndpoint = `https://api.openai.com/v1/chat/completions`;
 
 export async function fetchFromOpenAI(conversation, model = 'gpt-3.5-turbo', maxTokens = 1024) {
-    // 发送请求到你的后端API，而不是直接到OpenAI
-    const response = await fetch(backendEndpoint, {
+    const openAiKey = await getKey();
+    console.log(openAiKey);
+    const response = await fetch(openAiEndpoint, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${openAiKey}`,
         },
         body: JSON.stringify({
             model: model,
             messages: conversation,
             max_tokens: maxTokens,
+            // stream: true,
         }),
     });
 
-    // 检查响应是否成功
     if (!response.ok) {
-        throw new Error(`Backend API error: ${response.statusText}`);
+        throw new Error(`OpenAI API error: ${response.statusText}`);
     }
-
     const data = await response.json();
-    return data.message; // 注意这里的变化，根据你后端返回的结构
+    return data.choices[0].message.content;
 }
+
+const backendEndpoint = "https://api.autumnriver.chat";  // 替换为你的后端地址
+
+export async function getKey() {
+    try {
+        const response = await fetch(backendEndpoint + "/api/getkey");  // 确保你的URL指向正确的后端端点
+        if (!response.ok) {
+            throw new Error(`Failed to fetch key: ${response.statusText}`);
+        }
+        const data = await response.json();
+        if (data && data.key) { 
+            return String(data.key);
+        } else {
+            throw new Error("Key not found in response data");
+        }
+    } catch (error) {
+        console.error("Error fetching key:", error);
+        throw error;
+    }
+}
+
