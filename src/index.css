@@ -97,3 +97,27 @@ ul {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* 当屏幕宽度小于或等于600px时应用以下样式 */
+@media (max-width: 600px) {
+    #app {
+        width: 95%;  /* 提高宽度使其占据更多的屏幕空间 */
+        padding: 10px;  /* 减少填充以节省空间 */
+    }
+
+    .content-wrapper {
+        padding-right: 15px;  /* 减少右填充 */
+    }
+
+    h1, h2, p, ul {
+        margin: 10px 0;  /* 减少上下边距 */
+    }
+
+    .player-card {
+        position: relative;  /* 使其不再浮动并与内容整齐 */
+        top: auto;
+        right: auto;
+        width: 100%;  /* 使用全部宽度 */
+        margin-top: 20px;  /* 增加上边距以与其他内容区分 */
+    }
+}
