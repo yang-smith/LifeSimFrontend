@@ -137,10 +137,10 @@ export default {
       if (this.preloadedEvent) {
             this.eventDescription = this.preloadedEvent;
             this.player.experiences.push(this.preloadedEvent);
+            this.preloadedEvent = null;
             if(this.player.age > this.player.health*10 || this.player.wealth < 0 || this.player.mental_state < 0) {
               this.gameOver = true;
             }
-            this.preloadedEvent = null;
             this.isEventLoading = false;
             this.continueOrchoice = false;  
             return;
@@ -196,6 +196,10 @@ export default {
       this.eventDescription = "";
       this.gameOver = false;
       this.gameStarted = false;
+      this.isStartLoading = false,
+      this.isEventLoading = false,
+      this.isChoiceLoading = false,
+      this.continueOrchoice = true,
       this.startGame();
     },
     async preloadNextEvent() {
