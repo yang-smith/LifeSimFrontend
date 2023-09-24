@@ -177,7 +177,7 @@ export default {
       this.eventDescription += this.update;
       this.isChoiceLoading = false;
       this.continueOrchoice = true;
-      this.player.age += 10;
+      this.player.age += 50;
       this.preloadNextEvent();  // 处理用户选择后预加载下一个事件
     },
     resetGame() {
