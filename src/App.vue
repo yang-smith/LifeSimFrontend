@@ -143,7 +143,7 @@ export default {
             return;
       }
       try {
-        if(this.player.age + 30 > this.player.health*10 || this.player.wealth < 0 || this.player.mental_state < 0) {
+        if(this.player.age > this.player.health*10 || this.player.wealth < 0 || this.player.mental_state < 0) {
           const response = await death(this.player);
           this.eventDescription = response;
           this.player.experiences.push(response);
@@ -197,7 +197,7 @@ export default {
     },
     async preloadNextEvent() {
         try {
-            if(this.player.age + 30 > this.player.health*10 || this.player.wealth < 0 || this.player.mental_state < 0) {
+            if(this.player.age > this.player.health*10 || this.player.wealth < 0 || this.player.mental_state < 0) {
                 this.preloadedEvent = await death(this.player);
             } else {
                 this.preloadedEvent = await generateEvent(this.player);
